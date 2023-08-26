@@ -11,5 +11,8 @@ namespace Core.Repositories
     {
         Task<IEnumerable<Designation>> GetAllDesignationAsync();
         Task<Designation?> GetDesignationById(int  designationId);
+
+        Task<Designation?> Add(Designation designation);
+
     }
 }

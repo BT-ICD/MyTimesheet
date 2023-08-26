@@ -1,6 +1,7 @@
 using Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Persistence.DataContext;
 using Persistence.Repositories;
 
@@ -13,12 +14,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+
 //Add Database Context
 builder.Services.AddDbContext<TimesheetContext>(options =>
     {
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         options.UseSqlServer(connectionString);
     });
+
+//To implement Auto Mapper
+builder.Services.AddAutoMapper(typeof(Program));
 
 //Inject repositories 
 builder.Services.AddScoped<IDesignationRepository, DesignationRepository>();

@@ -18,7 +18,6 @@ namespace Persistence.Repositories
         {
             _context = context;
         }
-
         public async Task<IEnumerable<Designation>> GetAllDesignationAsync()
         {
             return await _context.Designations.ToListAsync();
@@ -28,5 +27,12 @@ namespace Persistence.Repositories
         {
             return await _context.Designations.Where(x=>x.DesignationId== designationId).FirstOrDefaultAsync();
         }
+        public async Task<Designation?> Add(Designation designation)
+        {
+            await _context.Designations.AddAsync(designation);
+            var result = await _context.SaveChangesAsync();
+            return designation;
+        }
+
     }
 }

@@ -1,9 +1,5 @@
-﻿using Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.DTOs;
+using Core.Models;
 
 namespace Core.Repositories
 {
@@ -13,6 +9,8 @@ namespace Core.Repositories
         Task<Designation?> GetDesignationById(int  designationId);
 
         Task<Designation?> Add(Designation designation);
+        Task<Designation?> Edit(Designation designation);
+        Task<DataUpdateResponse> Delete(Designation designation);
 
     }
 }

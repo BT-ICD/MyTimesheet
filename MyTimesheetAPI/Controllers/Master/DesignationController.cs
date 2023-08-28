@@ -2,7 +2,6 @@
 using Core.DTOs;
 using Core.Models;
 using Core.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MyTimesheetAPI.Controllers.Master
@@ -46,6 +45,41 @@ namespace MyTimesheetAPI.Controllers.Master
             var result = await designationRepository.Add(designation);
             return CreatedAtAction(nameof(GetById), new { designationId= designation.DesignationId }, result);
             
+        }
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Edit(DesignationEditDTO designationEditDTO)
+        {
+            var data = await designationRepository.GetDesignationById(designationEditDTO.DesignationId);
+            if(data == null)
+            {
+                return NotFound();
+            }
+            data = mapper.Map<Designation>(designationEditDTO);
+            //To-Do - next to replace with standard library to determine IP address from the request and User Name from the token
+            data.ModifiedOn = DateTime.Now;
+            data.ModifiedBy = "Admin";
+            data.ModifiedFrom = "::1";
+            var result = await designationRepository.Edit(data);
+            return Ok(result);
+        }
+        [HttpDelete]
+        [Route("{designationId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Delete(int designationId)
+        {
+            var data = await designationRepository.GetDesignationById(designationId);
+            if(data == null)
+            {
+                return NotFound();
+            }
+            data.IsDaleted = true;
+            data.DeletedOn = DateTime.Now;
+            data.DeletedBy = "Admin";
+            data.DeletedFrom = "::1";
+            var result = await designationRepository.Delete(data);
+            return Ok(result);
         }
     }
 }

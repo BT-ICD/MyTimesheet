@@ -9,6 +9,7 @@ namespace MyTimesheetAPI.AutoMapperProfile
         public AutoMapperProfile()
         {
             CreateMap<DesignationAddDTO, Designation>();
+            CreateMap<DesignationEditDTO, Designation>();
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using Core.Models;
+﻿using Core.DTOs;
+using Core.Models;
 using Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.DataContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Persistence.Repositories
 {
@@ -20,12 +16,12 @@ namespace Persistence.Repositories
         }
         public async Task<IEnumerable<Designation>> GetAllDesignationAsync()
         {
-            return await _context.Designations.ToListAsync();
+            return await _context.Designations.Where(x=>x.IsDaleted==false).ToListAsync();
         }
 
         public async Task<Designation?> GetDesignationById(int designationId)
         {
-            return await _context.Designations.Where(x=>x.DesignationId== designationId).FirstOrDefaultAsync();
+            return await _context.Designations.Where(x=>x.DesignationId== designationId && x.IsDaleted==false).FirstOrDefaultAsync();
         }
         public async Task<Designation?> Add(Designation designation)
         {
@@ -33,6 +29,43 @@ namespace Persistence.Repositories
             var result = await _context.SaveChangesAsync();
             return designation;
         }
+        public async Task<Designation?> Edit(Designation designation)
+        {
+            var data  = await _context.Designations.Where(x=>x.DesignationId==designation.DesignationId).FirstOrDefaultAsync();
+            if (data != null)
+            {
+                data.DesignationName = designation.DesignationName;
+                data.ModifiedBy = designation.ModifiedBy;
+                data.ModifiedOn = designation.ModifiedOn;
+                data.ModifiedFrom = designation.ModifiedFrom;
+                var result = await _context.SaveChangesAsync();
+                return designation;
+            }
+            return null;
+        }
 
+        public async Task<DataUpdateResponse> Delete(Designation designation)
+        {
+            int result = 0;
+            DataUpdateResponse response= new DataUpdateResponse();
+            var data = await _context.Designations.Where(x => x.DesignationId == designation.DesignationId && x.IsDaleted==fa).FirstOrDefaultAsync();
+            if(data == null)
+            {
+                response.Description = "Not Found";
+            }
+            else
+            {
+                data.IsDaleted = designation.IsDaleted;
+                data.DeletedOn = designation.DeletedOn;
+                data.DeletedBy = designation.DeletedBy;
+                data.DeletedFrom = designation.DeletedFrom;
+                result = await _context.SaveChangesAsync();
+                response.Description = "Record deleted";
+                
+            }
+            response.Status = Convert.ToBoolean(result);
+            response.RecordCount = result;
+            return response;
+        }
     }
 }

@@ -8,8 +8,8 @@ namespace MyTimesheetAPI.AutoMapperProfile
     {
         public AutoMapperProfile()
         {
-            CreateMap<DesignationAddDTO, Designation>();
-            CreateMap<DesignationEditDTO, Designation>();
+            CreateMap<DesignationAddDTO, Designation>().ReverseMap();
+            CreateMap<DesignationEditDTO, Designation>().ReverseMap();
         }
     }
 }

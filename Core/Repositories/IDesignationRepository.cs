@@ -5,7 +5,7 @@ namespace Core.Repositories
 {
     public interface IDesignationRepository
     {
-        Task<IEnumerable<Designation>> GetAllDesignationAsync();
+        Task<IEnumerable<DesignationEditDTO>> GetAllDesignationAsync();
         Task<Designation?> GetDesignationById(int  designationId);
 
         Task<Designation?> Add(Designation designation);

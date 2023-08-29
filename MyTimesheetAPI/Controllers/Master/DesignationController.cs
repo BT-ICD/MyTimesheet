@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure;
 using Core.DTOs;
 using Core.Models;
 using Core.Repositories;
@@ -24,6 +25,8 @@ namespace MyTimesheetAPI.Controllers.Master
         public async Task<IActionResult> GetAll()
         {
             var result  = await designationRepository.GetAllDesignationAsync();
+            //Following line commented for a learning refernce as mapper transform list to the list of DTO
+            //var response = mapper.Map<List<DesignationEditDTO>>(result);
             return Ok(result);
         }
         [HttpGet]
@@ -35,7 +38,8 @@ namespace MyTimesheetAPI.Controllers.Master
             var result = await designationRepository.GetDesignationById(designationId);
             if(result == null) 
                 return NotFound();
-            return Ok(result);
+            var response = mapper.Map<DesignationEditDTO>(result);
+            return Ok(response);
         }
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -43,7 +47,8 @@ namespace MyTimesheetAPI.Controllers.Master
         {
             Designation designation = mapper.Map<Designation>(designationAddDTO);
             var result = await designationRepository.Add(designation);
-            return CreatedAtAction(nameof(GetById), new { designationId= designation.DesignationId }, result);
+            var response = mapper.Map<DesignationEditDTO>(result);
+            return CreatedAtAction(nameof(GetById), new { designationId= designation.DesignationId }, response);
             
         }
         [HttpPut]
@@ -62,7 +67,8 @@ namespace MyTimesheetAPI.Controllers.Master
             data.ModifiedBy = "Admin";
             data.ModifiedFrom = "::1";
             var result = await designationRepository.Edit(data);
-            return Ok(result);
+            var response = mapper.Map<DesignationEditDTO>(result);
+            return Ok(response);
         }
         [HttpDelete]
         [Route("{designationId:int}")]

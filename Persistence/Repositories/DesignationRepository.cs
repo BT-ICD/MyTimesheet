@@ -14,9 +14,9 @@ namespace Persistence.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Designation>> GetAllDesignationAsync()
+        public async Task<IEnumerable<DesignationEditDTO>> GetAllDesignationAsync()
         {
-            return await _context.Designations.Where(x=>x.IsDaleted==false).ToListAsync();
+            return await _context.Designations.Where(x=>x.IsDaleted==false).Select(data => new DesignationEditDTO{ DesignationId= data.DesignationId, DesignationName= data.DesignationName}).ToListAsync();
         }
 
         public async Task<Designation?> GetDesignationById(int designationId)
@@ -48,7 +48,7 @@ namespace Persistence.Repositories
         {
             int result = 0;
             DataUpdateResponse response= new DataUpdateResponse();
-            var data = await _context.Designations.Where(x => x.DesignationId == designation.DesignationId && x.IsDaleted==fa).FirstOrDefaultAsync();
+            var data = await _context.Designations.Where(x => x.DesignationId == designation.DesignationId && x.IsDaleted==false).FirstOrDefaultAsync();
             if(data == null)
             {
                 response.Description = "Not Found";

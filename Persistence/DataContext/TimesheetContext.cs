@@ -12,7 +12,7 @@ namespace Persistence.DataContext
     {
         public TimesheetContext(DbContextOptions<TimesheetContext> options):base(options) {}
         public DbSet<Designation> Designations { get; set; }
-
+        public DbSet<Client> Clients { get; set; }
 
     }
 }

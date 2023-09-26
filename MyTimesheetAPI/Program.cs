@@ -28,7 +28,8 @@ builder.Services.AddAutoMapper(typeof(Program));
 
 //Inject repositories 
 builder.Services.AddScoped<IDesignationRepository, DesignationRepository>();
-
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ITaskTypeRepository, TaskTypeRepository>();
 
 var app = builder.Build();
 
@@ -39,6 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

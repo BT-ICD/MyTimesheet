@@ -29,6 +29,7 @@ namespace MyTimesheetAPI.Controllers.Master
             //var response = mapper.Map<List<DesignationEditDTO>>(result);
             return Ok(result);
         }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -41,6 +42,7 @@ namespace MyTimesheetAPI.Controllers.Master
             var response = mapper.Map<DesignationEditDTO>(result);
             return Ok(response);
         }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> Add(DesignationAddDTO designationAddDTO)
@@ -51,6 +53,7 @@ namespace MyTimesheetAPI.Controllers.Master
             return CreatedAtAction(nameof(GetById), new { designationId= designation.DesignationId }, response);
             
         }
+
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,6 +73,7 @@ namespace MyTimesheetAPI.Controllers.Master
             var response = mapper.Map<DesignationEditDTO>(result);
             return Ok(response);
         }
+
         [HttpDelete]
         [Route("{designationId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

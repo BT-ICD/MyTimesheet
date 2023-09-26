@@ -29,6 +29,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 //Inject repositories 
 builder.Services.AddScoped<IDesignationRepository, DesignationRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ITaskTypeRepository, TaskTypeRepository>();
 
 var app = builder.Build();
 

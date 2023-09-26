@@ -27,7 +27,7 @@ namespace Persistence.Repositories
         }
 
         public async Task<Client?> GetClientById(int clientId)
-        {
+        {   
             return await context.Clients.Where(x => x.ClientId == clientId && x.IsDaleted == false).FirstOrDefaultAsync();
         }
 

@@ -46,7 +46,7 @@ namespace MyTimesheetAPI.Controllers.Master
         public async Task<IActionResult> InsertClient(ClientAddDTO clientAddDTO)
         {
             Client client = mapper.Map<Client>(clientAddDTO);
-            var result = await clientRepository.InsertClient(client);
+            var result = await clientRepository.InsertClient(client);   
             var res = mapper.Map<ClientEditDTO>(result);
             return CreatedAtAction(nameof(GetByClientId), new { clientId = client.ClientId }, res);
         }

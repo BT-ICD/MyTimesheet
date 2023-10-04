@@ -14,7 +14,8 @@ namespace MyTimesheetAPI.AutoMapperProfile
             CreateMap<ClientEditDTO, Client>().ReverseMap();
             CreateMap<TaskTypeAddDTO, TaskType>().ReverseMap();
             CreateMap<TaskTypeEditDTO, TaskType>().ReverseMap();
-            
+            CreateMap<ClientContactAddDTO, ClientContacts>().ReverseMap();
+            CreateMap<ClientContactEditDTO, ClientContacts>().ReverseMap();
         }
     }
 }

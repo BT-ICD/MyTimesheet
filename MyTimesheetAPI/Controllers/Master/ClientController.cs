@@ -52,6 +52,8 @@ namespace MyTimesheetAPI.Controllers.Master
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateClient(ClientEditDTO clientEditDTO)
         {
             var data = await clientRepository.GetClientById(clientEditDTO.ClientId);

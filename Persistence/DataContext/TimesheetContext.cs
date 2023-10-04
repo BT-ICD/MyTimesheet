@@ -14,5 +14,29 @@ namespace Persistence.DataContext
         public DbSet<Designation> Designations { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<TaskType> TaskTypes { get; set; }
+        public DbSet<ClientContacts> ClientContacts { get; set; }
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    // Define one-to-many relationships here
+        //    modelBuilder.Entity<Client>()
+        //        .HasMany(c => c.Contacts)
+        //        .WithOne(cc => cc.Client)
+        //        .HasForeignKey(cc => cc.ClientId);
+
+        //    modelBuilder.Entity<Designation>()
+        //        .HasMany(d => d.Contacts)
+        //        .WithOne(cc => cc.Designation)
+        //        .HasForeignKey(cc => cc.DesignationId);
+        //}
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ClientContacts>().HasKey(cc => cc.ContactId); // Define ContactId as the primary key
+
+            // Define other configurations, such as relationships, if needed
+
+            base.OnModelCreating(modelBuilder);
+        }
+
     }
 }

@@ -37,9 +37,7 @@ namespace MyTimesheetAPI.Controllers.Master
         {
             var data = await clientContactRepository.GetClientContactById(contactId);
             if(data == null)
-            {
                 return NotFound();
-            }
             var res = mapper.Map<ClientContactEditDTO>(data);
             return Ok(res);
         }
@@ -48,7 +46,7 @@ namespace MyTimesheetAPI.Controllers.Master
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> InsertClientContact(ClientContactAddDTO clientContactAddDTO)
         {
-            ClientContacts clientContact = mapper.Map<ClientContacts>(clientContactAddDTO);
+            ClientContact clientContact = mapper.Map<ClientContact>(clientContactAddDTO);
             var result = await clientContactRepository.InsertClientContact(clientContact);
             var res = mapper.Map<ClientContactEditDTO>(result);
             return CreatedAtAction(nameof(GetClientContactById), new { contactId = clientContact.ContactId }, res);
@@ -64,13 +62,13 @@ namespace MyTimesheetAPI.Controllers.Master
             {
                 return NotFound();
             }
-            data = mapper.Map<ClientContacts>(clientContactEditDTO);
+            data = mapper.Map<ClientContact>(clientContactEditDTO);
             data.ModifiedOn = DateTime.Now;
             data.ModifiedBy = "Admin";
-            data.ModifiedFrom = "::1";
+            data.ModifiedFrom = "::1";      
             var result = await clientContactRepository.UpdateClientContact(data);
-            var res = mapper.Map<ClientContactEditDTO>(result);
-            return Ok(res);
+            var response = mapper.Map<ClientContactEditDTO>(result);
+            return Ok(response);
         }
 
         [HttpDelete]

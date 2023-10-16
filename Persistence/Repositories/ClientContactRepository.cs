@@ -21,22 +21,22 @@ namespace Persistence.Repositories
         }
         public async Task<IEnumerable<ClientContactEditDTO>> GetAllClientContact()
         {
-            return await context.ClientContacts.Where(x => x.IsDaleted == false).Select(data => new ClientContactEditDTO { ContactId = data.ContactId, Name = data.Name, Email = data.Email, Mobile = data.Mobile, ClientId = data.ClientId, DesginationId = data.DesignationId }).ToListAsync();
+            return await context.ClientContacts.Where(x => x.IsDaleted == false).Select(data => new ClientContactEditDTO { ContactId = data.ContactId, Name = data.Name, Email = data.Email, Mobile = data.Mobile, ClientId = data.ClientId, DesignationId = data.DesignationId }).ToListAsync();
         }
 
-        public async Task<ClientContacts?> GetClientContactById(int contactId)
+        public async Task<ClientContact?> GetClientContactById(int contactId)
         {
             return await context.ClientContacts.Where(x =>x.ContactId == contactId && x.IsDaleted == false).FirstOrDefaultAsync();
         }
 
-        public async Task<ClientContacts?> InsertClientContact(ClientContacts clientContacts)
+        public async Task<ClientContact?> InsertClientContact(ClientContact clientContacts)
         {
             await context.ClientContacts.AddAsync(clientContacts);
             var result = await context.SaveChangesAsync();
             return clientContacts;
         }
 
-        public async Task<ClientContacts?> UpdateClientContact(ClientContacts clientContacts)
+        public async Task<ClientContact?> UpdateClientContact(ClientContact clientContacts)
         {
             var data = await context.ClientContacts.Where(x=> x.ContactId == clientContacts.ContactId).FirstOrDefaultAsync();
             if (data != null)
@@ -54,7 +54,7 @@ namespace Persistence.Repositories
             }
             return null;
         }
-        public async Task<DataUpdateResponse> DeleteClientContact(ClientContacts clientContacts)
+        public async Task<DataUpdateResponse> DeleteClientContact(ClientContact clientContacts)
         {
             int result = 0;
             DataUpdateResponse response = new DataUpdateResponse();

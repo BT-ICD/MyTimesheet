@@ -11,9 +11,9 @@ namespace Core.Repositories
     public interface IClientContactRepository
     {
         Task<IEnumerable<ClientContactEditDTO>> GetAllClientContact();
-        Task<ClientContacts?> GetClientContactById(int contactId);
-        Task <ClientContacts?> InsertClientContact (ClientContacts clientContacts);
-        Task<ClientContacts?> UpdateClientContact (ClientContacts clientContacts);
-        Task<DataUpdateResponse> DeleteClientContact (ClientContacts clientContacts);
+        Task<ClientContact?> GetClientContactById(int contactId);
+        Task <ClientContact?> InsertClientContact (ClientContact clientContacts);
+        Task<ClientContact?> UpdateClientContact (ClientContact clientContacts);
+        Task<DataUpdateResponse> DeleteClientContact (ClientContact clientContacts);
     }
 }

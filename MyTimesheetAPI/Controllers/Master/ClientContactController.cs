@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Azure;
 using Core.DTOs;
 using Core.Models;
 using Core.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Persistence.Repositories;
 
 namespace MyTimesheetAPI.Controllers.Master
@@ -14,19 +16,39 @@ namespace MyTimesheetAPI.Controllers.Master
     {
         private readonly IClientContactRepository clientContactRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<ClientContactController> logger;
 
-        public ClientContactController(IClientContactRepository clientContactRepository, IMapper mapper)
+        public ClientContactController(IClientContactRepository clientContactRepository, IMapper mapper, ILogger<ClientContactController> logger)
         {
             this.clientContactRepository = clientContactRepository;
             this.mapper = mapper;
+            this.logger = logger;
+            this.logger.LogDebug("NLog injected into ClientContactController");
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllClientContact()
         {
-            var result = await clientContactRepository.GetAllClientContact();
-            return Ok(result);
+            try
+            {
+                logger.LogInformation("Request: GetAllClientContacts");
+
+                var result = await clientContactRepository.GetAllClientContact();
+
+                int Count = result.Count();
+
+                logger.LogInformation($"Response: GetAllClientContacts-ClientContact Count: {Count}");
+
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error in GetAllClientContactList");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+           
         }
 
         [HttpGet]
@@ -35,21 +57,60 @@ namespace MyTimesheetAPI.Controllers.Master
         [Route("{contactId:int}")]
         public async Task<IActionResult> GetClientContactById(int contactId)
         {
-            var data = await clientContactRepository.GetClientContactById(contactId);
-            if(data == null)
-                return NotFound();
-            var res = mapper.Map<ClientContactEditDTO>(data);
-            return Ok(res);
+            try
+            {
+                string requestJson = JsonConvert.SerializeObject(contactId);
+
+                logger.LogInformation($"Request: GetClientContactById:{requestJson}");
+
+
+                var data = await clientContactRepository.GetClientContactById(contactId);
+                if (data == null)
+                    return NotFound();
+                var response = mapper.Map<ClientContactEditDTO>(data);
+
+                string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: GetClientContactById :{responseJson}");
+
+                return Ok(response);
+
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in GetClientContactById");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> InsertClientContact(ClientContactAddDTO clientContactAddDTO)
         {
-            ClientContact clientContact = mapper.Map<ClientContact>(clientContactAddDTO);
-            var result = await clientContactRepository.InsertClientContact(clientContact);
-            var res = mapper.Map<ClientContactEditDTO>(result);
-            return CreatedAtAction(nameof(GetClientContactById), new { contactId = clientContact.ContactId }, res);
+            try
+            {
+                string requestJson = JsonConvert.SerializeObject(clientContactAddDTO);
+
+                logger.LogInformation($"Request: Insert ClientContact:{requestJson}");
+
+                ClientContact clientContact = mapper.Map<ClientContact>(clientContactAddDTO);
+                var result = await clientContactRepository.InsertClientContact(clientContact);
+
+                var response = mapper.Map<ClientContactEditDTO>(result);
+
+                string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: Inserted ClientContact:{responseJson}");
+
+                return CreatedAtAction(nameof(GetClientContactById), new { contactId = clientContact.ContactId }, response);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in Inserted ClientContact");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            }
+
         }
 
         [HttpPut]
@@ -57,18 +118,36 @@ namespace MyTimesheetAPI.Controllers.Master
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateClientContact(ClientContactEditDTO clientContactEditDTO)
         {
-            var data = await clientContactRepository.GetClientContactById(clientContactEditDTO.ContactId);
-            if (data == null)
+            try
             {
-                return NotFound();
+                var data = await clientContactRepository.GetClientContactById(clientContactEditDTO.ContactId);
+                if (data == null)
+                {
+                    return NotFound();
+                }
+                string requestJson = JsonConvert.SerializeObject(clientContactEditDTO);
+
+                logger.LogInformation($"Request: Update ClientContact: {requestJson}");
+
+                data = mapper.Map<ClientContact>(clientContactEditDTO);
+                data.ModifiedOn = DateTime.Now;
+                data.ModifiedBy = "Admin";
+                data.ModifiedFrom = "::1";
+                var result = await clientContactRepository.UpdateClientContact(data);
+                var response = mapper.Map<ClientContactEditDTO>(result);
+
+                string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: Updated ClientContact:{responseJson}");
+
+
+                return Ok(response);
             }
-            data = mapper.Map<ClientContact>(clientContactEditDTO);
-            data.ModifiedOn = DateTime.Now;
-            data.ModifiedBy = "Admin";
-            data.ModifiedFrom = "::1";      
-            var result = await clientContactRepository.UpdateClientContact(data);
-            var response = mapper.Map<ClientContactEditDTO>(result);
-            return Ok(response);
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in UpdateClientContact");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpDelete]
@@ -76,17 +155,35 @@ namespace MyTimesheetAPI.Controllers.Master
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteClientContact(int contactId)
         {
-            var data = await clientContactRepository.GetClientContactById(contactId);
-            if (data == null)
+            try
             {
-                return NotFound();
+
+                var data = await clientContactRepository.GetClientContactById(contactId);
+                if (data == null)
+                {
+                    return NotFound();
+                }
+                string requestJson = JsonConvert.SerializeObject(data);
+
+                logger.LogInformation($"Request: DeleteClientContact: {requestJson}");
+
+                data.IsDaleted = true;
+                data.DeletedOn = DateTime.Now;
+                data.DeletedBy = "Admin";
+                data.DeletedFrom = "::1";
+                var result = await clientContactRepository.DeleteClientContact(data);
+
+                string responseJson = JsonConvert.SerializeObject(result);
+
+                logger.LogInformation($"Response: Deleted ClientContact: {responseJson}");
+
+                return Ok(result);
             }
-            data.IsDaleted = true;
-            data.DeletedOn = DateTime.Now;
-            data.DeletedBy = "Admin";
-            data.DeletedFrom = "::1";
-            var result = await clientContactRepository.DeleteClientContact(data);
-            return Ok(result);
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error in DeleteClientContact");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Azure;
 using Core.DTOs;
 using Core.Models;
 using Core.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace MyTimesheetAPI.Controllers.Master
 {
@@ -13,19 +15,40 @@ namespace MyTimesheetAPI.Controllers.Master
     {
         private readonly IClientRepository clientRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<ClientController> logger;
 
-        public ClientController(IClientRepository clientRepository, IMapper mapper)
+        public ClientController(IClientRepository clientRepository, IMapper mapper, ILogger<ClientController> logger)
         {
             this.clientRepository = clientRepository;
             this.mapper = mapper;
+            this.logger = logger;
+            this.logger.LogDebug("NLog injected into ClientController");
+
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllClient()
         {
-            var result = await clientRepository.GetAllClientAsync();
-            return Ok(result);
+            try
+            {
+                logger.LogInformation("Request: GetAllClients");
+
+                var result = await clientRepository.GetAllClientAsync();
+                
+                int Count = result.Count();
+
+                logger.LogInformation($"Response: GetAllClients-Client Count: {Count}");
+
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in GetAllClientList");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            }
+
         }
 
         [HttpGet]
@@ -34,21 +57,58 @@ namespace MyTimesheetAPI.Controllers.Master
         [Route("{clientId:int}")]
         public async Task<IActionResult> GetByClientId(int clientId)
         {
-            var result = await clientRepository.GetClientById(clientId);
-            if (result == null)
-                return NotFound();
-            var res = mapper.Map<ClientEditDTO>(result);
-            return Ok(res);
+            try
+            {
+                string requestJson = JsonConvert.SerializeObject(clientId);
+
+                logger.LogInformation($"Request: GetClientById:{requestJson}");
+
+                var result = await clientRepository.GetClientById(clientId);
+                if (result == null)
+                    return NotFound();
+                var response = mapper.Map<ClientEditDTO>(result);
+
+                string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: GetClientContactById :{responseJson}");
+
+
+                return Ok(response);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in GetClientById");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+
+            }
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<IActionResult> InsertClient(ClientAddDTO clientAddDTO)
         {
-            Client client = mapper.Map<Client>(clientAddDTO);
-            var result = await clientRepository.InsertClient(client);   
-            var res = mapper.Map<ClientEditDTO>(result);
-            return CreatedAtAction(nameof(GetByClientId), new { clientId = client.ClientId }, res);
+            try
+            {
+                string requestJson = JsonConvert.SerializeObject(clientAddDTO);
+
+                logger.LogInformation($"Request: Insert Client:{requestJson}");
+
+                Client client = mapper.Map<Client>(clientAddDTO);
+                var result = await clientRepository.InsertClient(client);
+                var response = mapper.Map<ClientEditDTO>(result);
+
+                string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: Inserted Client:{responseJson}");
+
+                return CreatedAtAction(nameof(GetByClientId), new { clientId = client.ClientId }, response);
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in Inserted Client");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+           
         }
 
         [HttpPut]
@@ -56,18 +116,37 @@ namespace MyTimesheetAPI.Controllers.Master
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateClient(ClientEditDTO clientEditDTO)
         {
-            var data = await clientRepository.GetClientById(clientEditDTO.ClientId);
-            if (data == null)
+            try
             {
-                return NotFound();
+
+                var data = await clientRepository.GetClientById(clientEditDTO.ClientId);
+                if (data == null)
+                {
+                    return NotFound();
+                }
+                string requestJson = JsonConvert.SerializeObject(clientEditDTO);
+
+                logger.LogInformation($"Request: Update Client: {requestJson}");
+
+                data = mapper.Map<Client>(clientEditDTO);
+                data.ModifiedOn = DateTime.Now;
+                data.ModifiedBy = "Admin";
+                data.ModifiedFrom = "::1";
+                var result = await clientRepository.UpdateClient(data);
+                var response = mapper.Map<ClientEditDTO>(result);
+
+                string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: Updated Client:{responseJson}");
+
+                return Ok(response);
             }
-            data = mapper.Map<Client>(clientEditDTO);
-            data.ModifiedOn = DateTime.Now;
-            data.ModifiedBy = "Admin";
-            data.ModifiedFrom = "::1";
-            var result = await clientRepository.UpdateClient(data);
-            var res = mapper.Map<ClientEditDTO>(result);
-            return Ok(res);
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error in UpdateClient");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            
         }
 
         [HttpDelete]
@@ -75,17 +154,35 @@ namespace MyTimesheetAPI.Controllers.Master
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> DeleteClient(int clientId)
         {
-            var data = await clientRepository.GetClientById(clientId);
-            if(data == null)
+            try
             {
-                return NotFound();
+                var data = await clientRepository.GetClientById(clientId);
+                if (data == null)
+                {
+                    return NotFound();
+                }
+                string requestJson = JsonConvert.SerializeObject(data);
+
+                logger.LogInformation($"Request: DeleteClient: {requestJson}");
+
+                data.IsDaleted = true;
+                data.DeletedOn = DateTime.Now;
+                data.DeletedBy = "Admin";
+                data.DeletedFrom = "::1";
+                var result = await clientRepository.DeleteClient(data);
+
+                string responseJson = JsonConvert.SerializeObject(result);
+
+                logger.LogInformation($"Response: Deleted Client: {responseJson}");
+
+                return Ok(result);
             }
-            data.IsDaleted = true;
-            data.DeletedOn = DateTime.Now;
-            data.DeletedBy = "Admin";
-            data.DeletedFrom = "::1";
-            var result  = await clientRepository.DeleteClient(data);
-            return Ok(result);
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "Error in DeleteClient");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+           
         }
     }
 }

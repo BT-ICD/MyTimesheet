@@ -5,11 +5,13 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyTimesheetAPI", "MyTimesheetAPI\MyTimesheetAPI.csproj", "{C2974906-7E32-45C9-9F1A-0D37D63FAFC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{FFD60ABC-AA8E-4C63-9139-BD31141CAD6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{FFD60ABC-AA8E-4C63-9139-BD31141CAD6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{DF9A7870-491B-4168-BF57-138286C4C557}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{DF9A7870-491B-4168-BF57-138286C4C557}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{97EEBC10-A51D-482F-AC95-87D456105B66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "Persistence\Persistence.csproj", "{97EEBC10-A51D-482F-AC95-87D456105B66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerService", "LoggerService\LoggerService.csproj", "{F97A5E35-48A8-40A5-9FD3-B74B5CDCB8C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{97EEBC10-A51D-482F-AC95-87D456105B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97EEBC10-A51D-482F-AC95-87D456105B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97EEBC10-A51D-482F-AC95-87D456105B66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F97A5E35-48A8-40A5-9FD3-B74B5CDCB8C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F97A5E35-48A8-40A5-9FD3-B74B5CDCB8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F97A5E35-48A8-40A5-9FD3-B74B5CDCB8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F97A5E35-48A8-40A5-9FD3-B74B5CDCB8C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

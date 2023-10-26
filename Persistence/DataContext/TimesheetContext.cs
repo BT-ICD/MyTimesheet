@@ -16,6 +16,8 @@ namespace Persistence.DataContext
         public DbSet<TaskType> TaskTypes { get; set; }
         public DbSet<ClientContact> ClientContacts { get; set; }
 
+        public DbSet<TeamMember> TeamMember { get; set; }
+
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
         //    // Define one-to-many relationships here
@@ -32,7 +34,7 @@ namespace Persistence.DataContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ClientContact>().HasKey(cc => cc.ContactId); // Define ContactId as the primary key
-
+            modelBuilder.Entity<TeamMember>().HasKey(cc => cc.TeamMemberId);
             // Define other configurations, such as relationships, if needed
 
             base.OnModelCreating(modelBuilder);

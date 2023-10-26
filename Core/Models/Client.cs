@@ -15,7 +15,9 @@ namespace Core.Models
         [Required]
         [MaxLength(50, ErrorMessage = "Client name should be 50 characters only.")]
         public string Name { get; set; }
+        [Required]
         public string Email { get; set; }
+        [Required]
         public string Website { get; set; }
        
     }

@@ -17,7 +17,7 @@ namespace Core.Models
         [Required]
         public int DesignationId { get; set; }
         [Required]
-        [MaxLength(50, ErrorMessage = "COntact name should be 50 characters only.")]
+        [MaxLength(50, ErrorMessage = "Contact name should be 50 characters only.")]
         public string Name { get; set; }
         [Required]
         public string Mobile { get; set; }

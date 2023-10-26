@@ -40,6 +40,7 @@ try
     builder.Services.AddScoped<IClientRepository, ClientRepository>();
     builder.Services.AddScoped<ITaskTypeRepository, TaskTypeRepository>();
     builder.Services.AddScoped<IClientContactRepository, ClientContactRepository>();
+    builder.Services.AddScoped<ITeamMemberRepository, TeamMemberRepository>();
 
     var app = builder.Build();
 

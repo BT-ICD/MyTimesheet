@@ -27,5 +27,7 @@ namespace Core.DTOs
 
         public int DesignationId { get; set; }
 
+        public string DesignationName { get; set; }
+
     }
 }

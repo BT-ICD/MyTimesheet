@@ -21,7 +21,19 @@ namespace Persistence.Repositories
         }
         public async Task<IEnumerable<TeamMemberEdit>> GetAllTeamMemberAsync()
         {
-            return await this.context.TeamMember.Where(x => x.IsDaleted == false).Select(data => new TeamMemberEdit { TeamMemberId = data.TeamMemberId, Name = data.Name, Mobile = data.Mobile, Email = data.Email, Notes = data.Notes, AlternateContact = data.AlternateContact, DOB = data.DOB, DOJ = data.DOJ, DesignationId = data.DesignationId }).ToListAsync();
+            //return await this.context.TeamMember.Where(x => x.IsDaleted == false).Select(data => new TeamMemberEdit { TeamMemberId = data.TeamMemberId, Name = data.Name, Mobile = data.Mobile, Email = data.Email, Notes = data.Notes, AlternateContact = data.AlternateContact, DOB = data.DOB, DOJ = data.DOJ, DesignationId = data.DesignationId }).ToListAsync();
+
+            var teamMembers = await this.context.TeamMember.Where(x => x.IsDaleted == false).Select(data => new TeamMemberEdit{TeamMemberId =data.TeamMemberId,Name = data.Name, Mobile = data.Mobile, Email = data.Email, Notes = data.Notes,AlternateContact = data.AlternateContact, DOB = data.DOB, DOJ = data.DOJ, DesignationId = data.DesignationId}) .ToListAsync();
+
+            var designations = await this.context.Designations.Where(x => x.IsDaleted == false) .Select(data => new DesignationEditDTO{ DesignationId =data.DesignationId, DesignationName = data.DesignationName}).ToListAsync();
+
+            var teamMembersWithDesignation = teamMembers.Join( designations, tm => tm.DesignationId, d => d.DesignationId,(tm, d) => new TeamMemberEdit
+                { TeamMemberId = tm.TeamMemberId,Name = tm.Name,Mobile = tm.Mobile,Email = tm.Email,Notes = tm.Notes,AlternateContact = tm.AlternateContact,DOB = tm.DOB,DOJ = tm.DOJ,DesignationId = tm.DesignationId, DesignationName = d.DesignationName
+                });
+
+            return teamMembersWithDesignation;
+
+
         }
 
         public async Task<TeamMember?> GetTeamMemberById(int teamMemberId)
@@ -31,6 +43,7 @@ namespace Persistence.Repositories
 
         public async Task<TeamMember?> InsertTeamMember(TeamMember teamMember)
         {
+           // var designation = await this.context.Designations.FirstOrDefaultAsync(d => d.DesignationName == teamMember.DesignationName);
             await this.context.TeamMember.AddAsync(teamMember);
             var result = await this.context.SaveChangesAsync();
             return teamMember;

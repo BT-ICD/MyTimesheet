@@ -41,6 +41,7 @@ try
     builder.Services.AddScoped<ITaskTypeRepository, TaskTypeRepository>();
     builder.Services.AddScoped<IClientContactRepository, ClientContactRepository>();
     builder.Services.AddScoped<ITeamMemberRepository, TeamMemberRepository>();
+    builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
     var app = builder.Build();
 

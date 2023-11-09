@@ -53,6 +53,28 @@ namespace MyTimesheetAPI.Controllers.Master
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Route("lookup")]
+        public async Task<IActionResult> GetClientLookup()
+        {
+            try
+            {
+                logger.LogInformation("Request: GetClientLookup");
+
+                var result = await clientRepository.GetClientLookupAsync();
+
+                logger.LogInformation($"Response: GetClientLookup");
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error in GetClientLookup");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Route("{clientId:int}")]
         public async Task<IActionResult> GetByClientId(int clientId)

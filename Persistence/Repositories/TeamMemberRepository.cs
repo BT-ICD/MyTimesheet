@@ -19,34 +19,78 @@ namespace Persistence.Repositories
         {
             this.context = context;
         }
-        public async Task<IEnumerable<TeamMemberEdit>> GetAllTeamMemberAsync()
+        public async Task<IEnumerable<TeamMemberEditDTO>> GetAllTeamMemberAsync()
         {
             //return await this.context.TeamMember.Where(x => x.IsDaleted == false).Select(data => new TeamMemberEdit { TeamMemberId = data.TeamMemberId, Name = data.Name, Mobile = data.Mobile, Email = data.Email, Notes = data.Notes, AlternateContact = data.AlternateContact, DOB = data.DOB, DOJ = data.DOJ, DesignationId = data.DesignationId }).ToListAsync();
 
-            var teamMembers = await this.context.TeamMember.Where(x => x.IsDaleted == false).Select(data => new TeamMemberEdit{TeamMemberId =data.TeamMemberId,Name = data.Name, Mobile = data.Mobile, Email = data.Email, Notes = data.Notes,AlternateContact = data.AlternateContact, DOB = data.DOB, DOJ = data.DOJ, DesignationId = data.DesignationId}) .ToListAsync();
+            var teamMembers = await this.context.TeamMember.Where(x => x.IsDaleted == false).Select(data => new TeamMemberEditDTO{TeamMemberId =data.TeamMemberId,Name = data.Name, Mobile = data.Mobile, Email = data.Email, Notes = data.Notes,AlternateContact = data.AlternateContact, DOB = data.DOB, DOJ = data.DOJ, DesignationId = data.DesignationId, DesignationName = data.designation.DesignationName }) .ToListAsync();
 
-            var designations = await this.context.Designations.Where(x => x.IsDaleted == false) .Select(data => new DesignationEditDTO{ DesignationId =data.DesignationId, DesignationName = data.DesignationName}).ToListAsync();
+            //var designations = await this.context.Designations.Where(x => x.IsDaleted == false).Select(data => new DesignationEditDTO { DesignationId = data.DesignationId, DesignationName = data.DesignationName }).ToListAsync();
 
-            var teamMembersWithDesignation = teamMembers.Join( designations, tm => tm.DesignationId, d => d.DesignationId,(tm, d) => new TeamMemberEdit
-                { TeamMemberId = tm.TeamMemberId,Name = tm.Name,Mobile = tm.Mobile,Email = tm.Email,Notes = tm.Notes,AlternateContact = tm.AlternateContact,DOB = tm.DOB,DOJ = tm.DOJ,DesignationId = tm.DesignationId, DesignationName = d.DesignationName
-                });
+            //var teamMembersWithDesignation = teamMembers.Join(designations, tm => tm.DesignationId, d => d.DesignationId, (tm, d) => new TeamMemberEditDTO
+            //{
+            //    TeamMemberId = tm.TeamMemberId,
+            //    Name = tm.Name,
+            //    Mobile = tm.Mobile,
+            //    Email = tm.Email,
+            //    Notes = tm.Notes,
+            //    AlternateContact = tm.AlternateContact,
+            //    DOB = tm.DOB,
+            //    DOJ = tm.DOJ,
+            //    DesignationId = tm.DesignationId,
+            //    DesignationName = tm.DesignationName
+            //});
 
-            return teamMembersWithDesignation;
+            return teamMembers;
 
 
         }
 
+       
         public async Task<TeamMember?> GetTeamMemberById(int teamMemberId)
         {
-            return await this.context.TeamMember.Where(x => x.TeamMemberId == teamMemberId && x.IsDaleted == false).FirstOrDefaultAsync();
+            return await this.context.TeamMember.Include(x => x.designation).Where(x => x.TeamMemberId == teamMemberId && x.IsDaleted == false).FirstOrDefaultAsync();
         }
 
         public async Task<TeamMember?> InsertTeamMember(TeamMember teamMember)
         {
-           // var designation = await this.context.Designations.FirstOrDefaultAsync(d => d.DesignationName == teamMember.DesignationName);
-            await this.context.TeamMember.AddAsync(teamMember);
-            var result = await this.context.SaveChangesAsync();
-            return teamMember;
+
+            //var designation = await this.context.Designations.FirstOrDefaultAsync(d => d.DesignationName == designationName);
+
+            //if (designation != null)
+            //{
+            //    teamMember.designation = designation;
+            //    await this.context.TeamMember.AddAsync(teamMember);
+            //    var result = await this.context.SaveChangesAsync();
+
+            //    // await this.context.Entry(designation).Reference(d => d.DesignationName).LoadAsync();
+
+            //    var responseDTO = new TeamMemberEditDTO
+            //    {
+            //        TeamMemberId = teamMember.TeamMemberId,
+            //        Name = teamMember.Name,
+            //        Mobile = teamMember.Mobile,
+            //        Email = teamMember.Email,
+            //        Notes = teamMember.Notes,
+            //        AlternateContact = teamMember.AlternateContact,
+            //        DOB = teamMember.DOB,
+            //        DOJ = teamMember.DOJ,
+            //        DesignationId = teamMember.DesignationId,
+            //        DesignationName = designationName
+            //    };
+
+            //    return responseDTO;
+            //}
+
+            await context.TeamMember.AddAsync(teamMember);
+            var result = await context.SaveChangesAsync();
+
+            var insertedTeamMember = await context.TeamMember.Include(x => x.designation).FirstOrDefaultAsync(x => x.TeamMemberId == teamMember.TeamMemberId);
+
+            return insertedTeamMember;
+
+
+            return null;
         }
 
         public async Task<TeamMember?> UpdateTeamMember(TeamMember teamMember)
@@ -67,7 +111,14 @@ namespace Persistence.Repositories
                 data.ModifiedOn = teamMember.ModifiedOn;
                 data.ModifiedFrom = teamMember.ModifiedFrom;
                 var result = await this.context.SaveChangesAsync();
-                return teamMember;
+
+                var updatedDesignation = await context.Designations.Where(d => d.DesignationId == teamMember.DesignationId).FirstOrDefaultAsync();
+
+                // Update the loaded Designation information in the ClientContact
+                data.designation = updatedDesignation;
+
+                return data;
+
             }
             return null;
         }
@@ -95,5 +146,7 @@ namespace Persistence.Repositories
             response.RecordCount = result;
             return response;
         }
+
+    
     }
 }

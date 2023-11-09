@@ -10,7 +10,7 @@ namespace Core.Repositories
 {
     public interface ITeamMemberRepository
     {
-        Task<IEnumerable<TeamMemberEdit>> GetAllTeamMemberAsync();
+        Task<IEnumerable<TeamMemberEditDTO>> GetAllTeamMemberAsync();
         Task<TeamMember?> GetTeamMemberById(int teamMemberId);
         Task<TeamMember?> InsertTeamMember(TeamMember teamMember);
         Task<TeamMember?> UpdateTeamMember(TeamMember teamMember);

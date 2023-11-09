@@ -18,6 +18,8 @@ namespace Persistence.DataContext
 
         public DbSet<TeamMember> TeamMember { get; set; }
 
+        public DbSet<Project> Projects { get; set; }
+
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{
         //    // Define one-to-many relationships here
@@ -36,6 +38,8 @@ namespace Persistence.DataContext
             modelBuilder.Entity<ClientContact>().HasKey(cc => cc.ContactId); // Define ContactId as the primary key
             modelBuilder.Entity<TeamMember>().HasKey(cc => cc.TeamMemberId);
             // Define other configurations, such as relationships, if needed
+          
+          
 
             base.OnModelCreating(modelBuilder);
         }

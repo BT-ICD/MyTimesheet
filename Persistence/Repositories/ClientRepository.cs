@@ -77,5 +77,13 @@ namespace Persistence.Repositories
             response.RecordCount = result;  
             return response;
         }
+
+        public async Task<IEnumerable<ClientLookupDTO>> GetClientLookupAsync()
+        {
+            return await context.Clients.Where(x => !x.IsDaleted).Select(client => new ClientLookupDTO{ClientId = client.ClientId,Name = client.Name})
+        .ToListAsync();
+
+            
+        }
     }
 }

@@ -91,6 +91,14 @@ namespace MyTimesheetAPI.Controllers.Master
 
                 logger.LogInformation($"Request: Insert Designation:{requestJson}");
 
+                //var isDuplicate = await designationRepository.IsDesignationNameDuplicateAsync(designationAddDTO.DesignationName);
+
+                //if (isDuplicate != null)
+                //{
+
+                //    return Conflict();
+                //}
+
                 Designation designation = mapper.Map<Designation>(designationAddDTO);
                 var result = await designationRepository.Add(designation);
 

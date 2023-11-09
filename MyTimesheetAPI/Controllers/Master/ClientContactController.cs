@@ -17,12 +17,14 @@ namespace MyTimesheetAPI.Controllers.Master
         private readonly IClientContactRepository clientContactRepository;
         private readonly IMapper mapper;
         private readonly ILogger<ClientContactController> logger;
+        private readonly IDesignationRepository designationRepository;
 
-        public ClientContactController(IClientContactRepository clientContactRepository, IMapper mapper, ILogger<ClientContactController> logger)
+        public ClientContactController(IClientContactRepository clientContactRepository, IMapper mapper, ILogger<ClientContactController> logger, IDesignationRepository designationRepository)
         {
             this.clientContactRepository = clientContactRepository;
             this.mapper = mapper;
             this.logger = logger;
+            this.designationRepository = designationRepository;
             this.logger.LogDebug("NLog injected into ClientContactController");
         }
 
@@ -68,6 +70,7 @@ namespace MyTimesheetAPI.Controllers.Master
                 if (data == null)
                     return NotFound();
                 var response = mapper.Map<ClientContactEditDTO>(data);
+                response.DesignationName = data.designation?.DesignationName;
 
                 string responseJson = JsonConvert.SerializeObject(response);
 
@@ -93,23 +96,34 @@ namespace MyTimesheetAPI.Controllers.Master
 
                 logger.LogInformation($"Request: Insert ClientContact:{requestJson}");
 
+                //    var designationList = await designationRepository.GetAllDesignationAsync();
+
+                //// Find selectedDesignation
+                //    var selectedDesignation = designationList.FirstOrDefault(d => d.DesignationId == clientContactAddDTO.DesignationId);
+
                 ClientContact clientContact = mapper.Map<ClientContact>(clientContactAddDTO);
                 var result = await clientContactRepository.InsertClientContact(clientContact);
-
                 var response = mapper.Map<ClientContactEditDTO>(result);
+                response.DesignationName = result.designation?.DesignationName;
+
+                //// Add DesignationName to the response without modifying the entity
+                //    if (selectedDesignation != null)
+                //    {
+                //        response.DesignationName = selectedDesignation.DesignationName;
+                //    }
 
                 string responseJson = JsonConvert.SerializeObject(response);
 
-                logger.LogInformation($"Response: Inserted ClientContact:{responseJson}");
+                 logger.LogInformation($"Response: Inserted ClientContact:{responseJson}");
 
                 return CreatedAtAction(nameof(GetClientContactById), new { contactId = clientContact.ContactId }, response);
-            }
-            catch(Exception ex)
-            {
-                logger.LogError(ex, "Error in Inserted ClientContact");
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error in Inserted ClientContact");
+                    return StatusCode(StatusCodes.Status500InternalServerError);
 
-            }
+                }
 
         }
 
@@ -135,6 +149,7 @@ namespace MyTimesheetAPI.Controllers.Master
                 data.ModifiedFrom = "::1";
                 var result = await clientContactRepository.UpdateClientContact(data);
                 var response = mapper.Map<ClientContactEditDTO>(result);
+                response.DesignationName = result.designation?.DesignationName;
 
                 string responseJson = JsonConvert.SerializeObject(response);
 

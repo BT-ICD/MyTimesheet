@@ -15,6 +15,7 @@ namespace Core.Repositories
         Task<Client?> InsertClient(Client client);
         Task<Client?> UpdateClient(Client client);
         Task<DataUpdateResponse> DeleteClient(Client client);
+        Task<IEnumerable<ClientLookupDTO>> GetClientLookupAsync();
 
     }
 }

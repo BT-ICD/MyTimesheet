@@ -67,5 +67,10 @@ namespace Persistence.Repositories
             response.RecordCount = result;
             return response;
         }
+
+        //public async task<designation?> isdesignationnameduplicateasync(string designationname)
+        //{
+        //    return await _context.designations.where(x => x.designationname == designationname).firstordefaultasync();
+        //}
     }
 }

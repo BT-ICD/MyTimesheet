@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Core.DTOs
 {
-    public class ClientContactAddDTO
+    public class ProjectEditDTO
     {
+        public int ProjectId { get; set; }
         public string Name { get; set; }
-        public string Email { get; set; }
-        public string Mobile { get; set; }
         public int ClientId { get; set; }
-        public int DesignationId { get; set; }
-        public string DesignationName { get; set; }
+        public DateTime InitiatedOn { get; set; }
+    
+        public string ClientName { get; set; }
     }
 }

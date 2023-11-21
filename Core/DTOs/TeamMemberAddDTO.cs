@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.DTOs
 {
-    public class TeamMemberAdd
+    public class TeamMemberAddDTO
     {
         public string Name { get; set; }
 
@@ -24,5 +24,7 @@ namespace Core.DTOs
         public DateTime DOJ { get; set; }
 
         public int DesignationId { get; set; }
+
+        public string DesignationName { get; set; }
     }
 }

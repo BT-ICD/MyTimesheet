@@ -21,24 +21,29 @@ namespace Persistence.Repositories
         }
         public async Task<IEnumerable<ClientContactEditDTO>> GetAllClientContact()
         {
-            return await context.ClientContacts.Where(x => x.IsDaleted == false).Select(data => new ClientContactEditDTO { ContactId = data.ContactId, Name = data.Name, Email = data.Email, Mobile = data.Mobile, ClientId = data.ClientId, DesignationId = data.DesignationId }).ToListAsync();
+            return await context.ClientContacts.Where(x => x.IsDaleted == false).Select(data => new ClientContactEditDTO { ContactId = data.ContactId, Name = data.Name, Email = data.Email, Mobile = data.Mobile, ClientId = data.ClientId, DesignationId = data.DesignationId, DesignationName = data.designation.DesignationName }).ToListAsync();
         }
 
         public async Task<ClientContact?> GetClientContactById(int contactId)
         {
-            return await context.ClientContacts.Where(x =>x.ContactId == contactId && x.IsDaleted == false).FirstOrDefaultAsync();
+            return await context.ClientContacts.Include(x => x.designation).Where(x => x.ContactId == contactId && x.IsDaleted == false).FirstOrDefaultAsync();
         }
 
         public async Task<ClientContact?> InsertClientContact(ClientContact clientContacts)
         {
             await context.ClientContacts.AddAsync(clientContacts);
             var result = await context.SaveChangesAsync();
-            return clientContacts;
+
+            var insertedClientContact = await context.ClientContacts.Include(x => x.designation).FirstOrDefaultAsync(x => x.ContactId == clientContacts.ContactId);
+
+            return insertedClientContact;
+
+           // return clientContacts;
         }
 
         public async Task<ClientContact?> UpdateClientContact(ClientContact clientContacts)
         {
-            var data = await context.ClientContacts.Where(x=> x.ContactId == clientContacts.ContactId).FirstOrDefaultAsync();
+            var data = await context.ClientContacts.Include(x => x.designation).Where(x=> x.ContactId == clientContacts.ContactId).FirstOrDefaultAsync();
             if (data != null)
             {
                 data.Name = clientContacts.Name;
@@ -50,7 +55,14 @@ namespace Persistence.Repositories
                 data.ModifiedOn = clientContacts.ModifiedOn;
                 data.ModifiedFrom = clientContacts.ModifiedFrom;
                 var result = await context.SaveChangesAsync();
-                return clientContacts;
+
+                var updatedDesignation = await context.Designations.Where(d => d.DesignationId == clientContacts.DesignationId).FirstOrDefaultAsync();
+
+                // Update the loaded Designation information in the ClientContact
+                data.designation = updatedDesignation;
+
+
+                return data;
             }
             return null;
         }

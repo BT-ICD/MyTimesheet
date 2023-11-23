@@ -71,9 +71,85 @@ namespace MyTimesheetAPI.Controllers.Master
             var result = await projectRepository.InsertProject(project);
 
             var response = mapper.Map<ProjectEditDTO>(result);
+            //response.ClientName = result.Client?.Name;
+
             return CreatedAtAction(nameof(GetProjectById), new { projectId = project.ProjectId }, response);
 
 
         }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProject(ProjectEditDTO projectEdit)
+        {
+            try
+            {
+                var data = await projectRepository.GetProjectById(projectEdit.ProjectId);
+                if (data == null)
+                {
+                    return NotFound();
+                }
+                string requestJson = JsonConvert.SerializeObject(projectEdit);
+
+                logger.LogInformation($"Request: Update Project: {requestJson}");
+
+                data = mapper.Map<Project>(projectEdit);
+                data.ModifiedOn = DateTime.Now;
+                data.ModifiedBy = "Admin";
+                data.ModifiedFrom = "::1";
+
+                var result = await projectRepository.UpdateProject(data);
+                var response = mapper.Map<ProjectEditDTO>(result);
+                response.ClientName = result.Client.Name;
+
+                 string responseJson = JsonConvert.SerializeObject(response);
+
+                logger.LogInformation($"Response: Updated Project:{responseJson}");
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error in UpdateProject");
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+}
+
+        [HttpDelete]
+        [Route("{projectId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Delete(int projectId)
+        {
+            //try
+            //{
+                var data = await projectRepository.GetProjectById(projectId);
+            if (data == null)
+            {
+                return NotFound();
+            }
+            string requestJson = JsonConvert.SerializeObject(data);
+
+           
+            data.IsDaleted = true;
+            data.DeletedOn = DateTime.Now;
+            data.DeletedBy = "Admin";
+            data.DeletedFrom = "::1";
+            var result = await projectRepository.DeleteProject(data);
+
+            string responseJson = JsonConvert.SerializeObject(result);
+
+            logger.LogInformation($"Response: Deleted Project: {responseJson}");
+
+            return Ok(result);
+            //}
+            //catch (Exception ex)
+            //{
+            //    logger.LogError(ex, "Error in DeleteProject");
+            //    return StatusCode(StatusCodes.Status500InternalServerError);
+            //}
+        }
+
     }
 }

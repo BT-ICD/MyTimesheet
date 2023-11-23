@@ -11,5 +11,6 @@ namespace Core.DTOs
         public string Name { get; set; }
         public int ClientId { get; set; }
         public DateTime InitiatedOn { get; set; }
+       // public string ClientName { get; set; }
     }
 }

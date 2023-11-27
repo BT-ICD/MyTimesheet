@@ -40,13 +40,15 @@ namespace Persistence.Repositories
 
         public async Task<Project?> GetProjectById(int projectId)
         {
-            return await this.context.Projects.Where(x=> x.ProjectId == projectId && x.IsDaleted == false).FirstOrDefaultAsync();
+            return await this.context.Projects.Include(x => x.Client).Where(x => x.ProjectId == projectId && x.IsDaleted == false).FirstOrDefaultAsync();
         }
 
         public async Task<Project?> InsertProject(Project project)
         {
             await this.context.Projects.AddAsync(project);
             var result = await this.context.SaveChangesAsync();
+            var insertedProject= await context.Projects.Include(x => x.Client).FirstOrDefaultAsync(x => x.ProjectId == project.ProjectId);
+
             return project;
             
         }
@@ -65,7 +67,12 @@ namespace Persistence.Repositories
                 data.ModifiedOn = project.ModifiedOn;
                 data.ModifiedFrom = project.ModifiedFrom;
                 var result = await this.context.SaveChangesAsync();
-                return project;
+
+                var updatedClient = await context.Clients.Where(d => d.ClientId == project.ClientId).FirstOrDefaultAsync();
+
+
+               // data.Client = updatedClient;
+                return data;
             }
             return null;
         }

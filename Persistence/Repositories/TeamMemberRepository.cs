@@ -89,8 +89,6 @@ namespace Persistence.Repositories
 
             return insertedTeamMember;
 
-
-            return null;
         }
 
         public async Task<TeamMember?> UpdateTeamMember(TeamMember teamMember)
